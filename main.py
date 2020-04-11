@@ -3,7 +3,7 @@
 import os
 import json
 
-def get_profiles(path):
+def get_profiles(browser, path):
   profiles = []
   if os.path.isdir(path) == False:
     return profiles
@@ -13,19 +13,31 @@ def get_profiles(path):
     if folder != 'System Profile' and os.path.isfile(file):
       with open(file) as f:
         data = json.load(f)
-        profiles.append(data['profile']['name'])
+        name = data['profile']['name']
+        profiles.append({
+          "icon": {
+            "path": "icons/{}".format(browser['icon'])
+          },
+          "arg": "{} {}".format(browser['name'], folder),
+          "subtitle": "Open Chrome using {} profile.".format(name),
+          "title": name,
+        })
   return profiles
 
 
 home = os.path.expanduser("~")
 
 browsers = [
-  '/Library/Application Support/Google/Chrome',
-  '/Library/Application Support/Google/Chrome Canary',
-  '/Library/Application Support/Chromium'
+  { 'name': 'CHROME', 'path': '/Library/Application Support/Google/Chrome', 'icon': 'chrome.icns' },
+  { 'name': 'CHROME_CANARY', 'path': '/Library/Application Support/Google/Chrome Canary', 'icon': 'canary.icns' },
+  # { 'name': 'CHROMIUM', 'path': '/Library/Application Support/Chromium', 'icon': 'chromium.icns' },
 ]
 
+profiles = []
+
 for browser in browsers:
-  path = "{}/{}".format(home, browser)
-  profiles = get_profiles(path)
-  print(profiles)
+  path = "{}/{}".format(home, browser['path'])
+  prof = get_profiles(browser, path)
+  profiles += prof
+
+print json.dumps({"items": profiles}, indent=2)
