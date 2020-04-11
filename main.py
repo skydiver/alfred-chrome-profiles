@@ -5,6 +5,8 @@ import json
 
 def get_profiles(path):
   profiles = []
+  if os.path.isdir(path) == False:
+    return profiles
   folders = [ name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name)) ]
   for folder in folders:
     file = "{}/{}/Preferences".format(path, folder)
@@ -16,8 +18,14 @@ def get_profiles(path):
 
 
 home = os.path.expanduser("~")
-path = "{}/Library/Application Support/Google/Chrome".format(home)
 
+browsers = [
+  '/Library/Application Support/Google/Chrome',
+  '/Library/Application Support/Google/Chrome Canary',
+  '/Library/Application Support/Chromium'
+]
 
-profiles = get_profiles(path)
-print(profiles)
+for browser in browsers:
+  path = "{}/{}".format(home, browser)
+  profiles = get_profiles(path)
+  print(profiles)
